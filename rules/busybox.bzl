@@ -118,6 +118,10 @@ def _make_resources_flag(
         ],
     )
 
+def _disable_warnings(args):
+    # Disable warnings - this are output to stdin/stderr which breaks worker mode
+    args.add("--logWarnings=false")
+
 def _path(f):
     return f.path
 
@@ -283,7 +287,7 @@ def _package(
     transitive_input_files = []
 
     args = ctx.actions.args()
-    args.use_param_file("@%s", use_always=True)
+    args.use_param_file("@%s", use_always = True)
     args.set_param_file_format("multiline")
     args.add("--tool", "AAPT2_PACKAGE")
     args.add("--")
@@ -391,6 +395,8 @@ def _package(
     if java_package:
         args.add("--packageForR", java_package)
 
+    _disable_warnings(args)
+
     args.add_joined(
         "--resourceApks",
         resource_apks,
@@ -402,7 +408,7 @@ def _package(
         ctx = ctx,
         host_javabase = host_javabase,
         executable = busybox,
-        tools = [aapt],
+        tools = [aapt, busybox],
         arguments = [args],
         inputs = depset(input_files, transitive = transitive_input_files),
         outputs = output_files,
@@ -430,7 +436,7 @@ def _parse(
       host_javabase: Target. The host javabase.
     """
     args = ctx.actions.args()
-    args.use_param_file("@%s", use_always=True)
+    args.use_param_file("@%s", use_always = True)
     args.set_param_file_format("multiline")
     args.add("--tool", "PARSE")
     args.add("--")
@@ -442,6 +448,8 @@ def _parse(
         ),
     )
     args.add("--output", out_symbols)
+
+    _disable_warnings(args)
 
     _java.run(
         ctx = ctx,
@@ -499,7 +507,7 @@ def _merge_assets(
       host_javabase: Target. The host javabase.
     """
     args = ctx.actions.args()
-    args.use_param_file("@%s", use_always=True)
+    args.use_param_file("@%s", use_always = True)
     args.set_param_file_format("multiline")
     args.add("--tool", "MERGE_ASSETS")
     args.add("--")
@@ -525,6 +533,8 @@ def _merge_assets(
         map_each = _make_merge_assets_flags,
         join_with = "&",
     )
+
+    _disable_warnings(args)
 
     _java.run(
         ctx = ctx,
@@ -583,7 +593,7 @@ def _validate_and_link(
 
     # Retrieves the list of files at runtime when a directory is passed.
     args = ctx.actions.args()
-    args.use_param_file("@%s", use_always=True)
+    args.use_param_file("@%s", use_always = True)
     args.set_param_file_format("multiline")
     args.add("--tool", "LINK_STATIC_LIBRARY")
     args.add("--")
@@ -614,6 +624,8 @@ def _validate_and_link(
         join_with = ":",
     )
     input_files.extend(resource_apks)
+
+    _disable_warnings(args)
 
     _java.run(
         ctx = ctx,
@@ -657,7 +669,7 @@ def _compile(
 
     # Retrieves the list of files at runtime when a directory is passed.
     args = ctx.actions.args()
-    args.use_param_file("@%s", use_always=True)
+    args.use_param_file("@%s", use_always = True)
     args.set_param_file_format("multiline")
     args.add("--tool", "COMPILE_LIBRARY_RESOURCES")
     args.add("--")
@@ -671,6 +683,8 @@ def _compile(
         ),
     )
     args.add("--output", out_file)
+
+    _disable_warnings(args)
 
     _java.run(
         ctx = ctx,
@@ -736,7 +750,7 @@ def _merge_compiled(
     transitive_input_files = []
 
     args = ctx.actions.args()
-    args.use_param_file("@%s", use_always=True)
+    args.use_param_file("@%s", use_always = True)
     args.set_param_file_format("multiline")
     args.add("--tool", "MERGE_COMPILED")
     args.add("--")
@@ -775,6 +789,8 @@ def _merge_compiled(
             join_with = "&",
         )
         transitive_input_files.append(transitive_compiled_resources)
+
+    _disable_warnings(args)
 
     _java.run(
         ctx = ctx,
@@ -872,6 +888,8 @@ def _merge_manifests(
         args.add("--log", out_log_file)
         outputs.append(out_log_file)
 
+    _disable_warnings(args)
+
     _java.run(
         ctx = ctx,
         host_javabase = host_javabase,
@@ -918,7 +936,7 @@ def _process_databinding(
     res_dirs = _get_unique_res_dirs(resource_files)
 
     args = ctx.actions.args()
-    args.use_param_file("@%s", use_always=True)
+    args.use_param_file("@%s", use_always = True)
     args.set_param_file_format("multiline")
     args.add("--tool", "PROCESS_DATABINDING")
     args.add("--")
@@ -926,6 +944,8 @@ def _process_databinding(
     args.add_all(res_dirs, before_each = "--resource_root")
     args.add("--dataBindingInfoOut", out_databinding_info)
     args.add("--appId", java_package)
+
+    _disable_warnings(args)
 
     _java.run(
         ctx = ctx,
@@ -976,7 +996,7 @@ def _generate_binary_r(
       host_javabase: A Target. The host javabase.
     """
     args = ctx.actions.args()
-    args.use_param_file("@%s", use_always=True)
+    args.use_param_file("@%s", use_always = True)
     args.set_param_file_format("multiline")
     args.add("--tool", "GENERATE_BINARY_R")
     args.add("--")
@@ -997,6 +1017,8 @@ def _generate_binary_r(
     # TODO(b/154003916): support transitive "--library transitive_r_txt_path,transitive_manifest_path" flags
     args.add("--classJarOutput", out_class_jar)
     args.add("--targetLabel", str(ctx.label))
+
+    _disable_warnings(args)
 
     _java.run(
         ctx = ctx,
@@ -1044,7 +1066,7 @@ def _make_aar(
         when a resource conflict occurs.
     """
     args = ctx.actions.args()
-    args.use_param_file("@%s", use_always=True)
+    args.use_param_file("@%s", use_always = True)
     args.set_param_file_format("multiline")
     args.add("--tool", "GENERATE_AAR")
     args.add("--")
@@ -1064,6 +1086,8 @@ def _make_aar(
     args.add_all(proguard_specs, before_each = "--proguardSpec")
     if should_throw_on_conflict:
         args.add("--throwOnResourceConflict")
+
+    _disable_warnings(args)
 
     _java.run(
         ctx = ctx,
