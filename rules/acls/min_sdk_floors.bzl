@@ -20,9 +20,7 @@ cover the entire depot.
 
 MIN_SDK_FLOORS = {
     19: [
-        "//:__subpackages__",
     ],
     14: [
-        "//:__subpackages__",
     ],
 }
