@@ -43,4 +43,3 @@ filegroup(
     output_group = "python_zip_file",
     visibility = ["//visibility:public"],
 )
-
