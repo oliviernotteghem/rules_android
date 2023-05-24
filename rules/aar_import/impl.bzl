@@ -152,6 +152,7 @@ def _process_resources(
         exports_manifest = getattr(ctx.attr, "exports_manifest", True),
         propagate_resources = True,
         namespaced_r_class = False,
+        propagate_transitive_resources_class_jars = False,
 
         # Tool and Processing related inputs
         aapt = _get_android_toolchain(ctx).aapt2.files_to_run,
