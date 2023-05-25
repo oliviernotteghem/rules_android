@@ -1191,7 +1191,7 @@ def _process_starlark(
         instrument_xslt = None,
         xsltproc = None,
         zip_tool = None,
-        namespaced_r_class = True):
+        namespaced_r_class = False):
     """Processes Android Resources.
 
     Args:
@@ -1869,6 +1869,7 @@ def _process(
         fix_export_exporting = False,
         propagate_resources = True,
         propagate_transitive_resources_class_jars = True,
+        namespaced_r_class = False,
         zip_tool = None):
     out_ctx = _process_starlark(
         ctx,
@@ -1902,7 +1903,7 @@ def _process(
         java_toolchain = java_toolchain,
         host_javabase = host_javabase,
         zip_tool = zip_tool,
-        namespaced_r_class = _busybox.ANDROID_RESOURCES_STRICT_DEPS not in ctx.disabled_features,
+        namespaced_r_class = namespaced_r_class,
     )
 
     if _VALIDATION_OUTPUTS not in out_ctx:

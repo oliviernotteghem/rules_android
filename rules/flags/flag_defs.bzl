@@ -103,3 +103,9 @@ def define_flags():
         default = True,
         description = "Collect and propagate transitive resources class jars from dependencies",
     )
+
+    flags.DEFINE_bool(
+        name = "namespaced_r_class",
+        default = False,
+        description = "Enables namespaced R class generation",
+    )
