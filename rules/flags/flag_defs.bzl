@@ -86,7 +86,6 @@ def define_flags():
         description = "",
     )
 
-
     flags.EXPOSE_native_bool(
         name = "stamp",
         description = "Accesses the native --stamp CLI flag",
@@ -96,4 +95,10 @@ def define_flags():
         name = "use_studio_deployer",
         default = True,
         description = "Use Studio Deployer to install apks",
+    )
+
+    flags.DEFINE_bool(
+        name = "namespaced_r_class",
+        default = False,
+        description = "Enables namespaced R class generation",
     )
