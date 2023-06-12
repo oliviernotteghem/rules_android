@@ -21,7 +21,7 @@ load(
     "processing_pipeline",
 )
 load("//rules:resources.bzl", _resources = "resources")
-load("//rules:utils.bzl",  "get_android_toolchain", "utils")
+load("//rules:utils.bzl", "get_android_toolchain", "utils")
 
 def _process_manifest(ctx, **unused_ctxs):
     manifest_ctx = _resources.bump_min_sdk(
@@ -39,7 +39,7 @@ def _process_manifest(ctx, **unused_ctxs):
 def _process_resources_for_android_local_test(ctx, manifest_ctx, java_package, **unused_ctx):
     packaged_resources_ctx = _resources.package(
         ctx,
-        manifest = manifest_ctx.min_sdk_bumped_manifest,
+        manifest = manifest_ctx.processed_manifest,
         manifest_values = utils.expand_make_vars(ctx, ctx.attr.manifest_values),
         java_package = java_package,
         use_legacy_manifest_merger = False,
