@@ -713,7 +713,7 @@ def _compile(
         executable = busybox,
         tools = [aapt],
         arguments = [args],
-        inputs = resource_files + assets +  optional_inputs,
+        inputs = resource_files + assets + optional_inputs,
         outputs = [out_file] + optional_outputs,
         mnemonic = "CompileAndroidResources",
         progress_message = "Compiling Android Resources in %s" % out_file.short_path,
@@ -891,6 +891,7 @@ def _merge_manifests(
     args.add("--")
     if manifest:
         args.add("--manifest", manifest)
+    args.add("--mergeManifestPermissions")
     args.add_all(
         "--mergeeManifests",
         [mergee_manifests],
