@@ -158,6 +158,7 @@ def _process_resources(
         propagate_resources = True,
         namespaced_r_class = False,
         output_library_merged_assets = _flags.get(ctx).output_library_merged_assets,
+        merge_manifest_permissions = _flags.get(ctx).merge_manifest_permissions,
 
         # Tool and Processing related inputs
         aapt = _get_android_toolchain(ctx).aapt2.files_to_run,

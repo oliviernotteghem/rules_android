@@ -108,3 +108,9 @@ def define_flags():
         default = True,
         description = "If disabled, does not produce merged asset.zip outputs for library targets",
     )
+
+    flags.DEFINE_bool(
+        name = "merge_manifest_permissions",
+        default = False,
+        description = "If disabled, does not merge manifest permissions.",
+    )

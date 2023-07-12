@@ -494,6 +494,7 @@ def _package(
         enable_manifest_merging = True,
         should_compile_java_srcs = True,
         minsdk_proguard_config = None,
+        merge_manifest_permissions = False,
         aapt = None,
         has_local_proguard_specs = False,
         android_jar = None,
@@ -553,6 +554,8 @@ def _package(
       should_compile_java_srcs: boolean. If native android_binary should perform java compilation.
       minsdk_proguard_config: Optional file. Proguard config for the minSdkVersion to include in the
         returned resource context.
+      merge_manifest_permissions: Whether to merge permissions when merging the
+        Android manifests.
       aapt: FilesToRunProvider. The aapt executable or FilesToRunProvider.
       has_local_proguard_specs: If the target has proguard specs.
       android_jar: File. The Android jar.
@@ -668,6 +671,7 @@ def _package(
                 mergee_manifests = mergee_manifests,
                 manifest_values = manifest_values,
                 merge_type = "APPLICATION",
+                merge_manifest_permissions = merge_manifest_permissions,
                 java_package = java_package,
                 busybox = busybox,
                 host_javabase = host_javabase,
@@ -1262,6 +1266,7 @@ def _process_starlark(
         enable_data_binding = False,
         propagate_resources = True,
         fix_resource_transitivity = True,
+        merge_manifest_permissions = False,
         aapt = None,
         android_jar = None,
         android_kit = None,
@@ -1315,6 +1320,8 @@ def _process_starlark(
         continue to propagate others (AndroidLibraryResourceClassJarProvider).
       fix_resource_transitivity: Whether to ensure that transitive resources are
         correctly marked as transitive.
+      merge_manifest_permissions: Whether to merge permissions when merging the
+        Android manifests.
       aapt: FilesToRunProvider. The aapt executable or FilesToRunProvider.
       android_jar: File. The android Jar.
       android_kit: FilesToRunProvider. The android_kit executable or
@@ -1506,6 +1513,7 @@ def _process_starlark(
                 out_file = stamped_manifest,
                 manifest = manifest,
                 merge_type = "LIBRARY",
+                merge_manifest_permissions = merge_manifest_permissions,
                 java_package = java_package,
                 busybox = busybox,
                 host_javabase = host_javabase,
@@ -1935,6 +1943,7 @@ def _process(
         res_v3_dummy_manifest = None,
         res_v3_dummy_r_txt = None,
         fix_resource_transitivity = True,
+        merge_manifest_permissions = False,
         fix_export_exporting = False,
         propagate_resources = True,
         namespaced_r_class = False,
@@ -1960,6 +1969,7 @@ def _process(
         resource_files = depset(transitive = [target.files for target in resource_files]).to_list(),
         enable_data_binding = enable_data_binding,
         fix_resource_transitivity = fix_resource_transitivity,
+        merge_manifest_permissions = merge_manifest_permissions,
         neverlink = neverlink,
         propagate_resources = propagate_resources,
         android_jar = android_jar,

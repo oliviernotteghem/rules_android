@@ -179,6 +179,7 @@ def _process_resources(ctx, java_package, manifest_ctx, **unused_ctxs):
         fix_export_exporting = acls.in_fix_export_exporting_rollout(str(ctx.label)),
         namespaced_r_class = _flags.get(ctx).namespaced_r_class,
         output_library_merged_assets = _flags.get(ctx).output_library_merged_assets,
+        merge_manifest_permissions = _flags.get(ctx).merge_manifest_permissions,
 
         # Tool and Processing related inputs
         aapt = get_android_toolchain(ctx).aapt2.files_to_run,
