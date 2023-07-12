@@ -21,7 +21,8 @@ load(
     "processing_pipeline",
 )
 load("//rules:resources.bzl", _resources = "resources")
-load("//rules:utils.bzl", "get_android_toolchain", "utils")
+load("//rules:utils.bzl", "compilation_mode", "get_android_toolchain", "utils")
+load("//rules:attrs.bzl", _attrs = "attrs")
 
 def _process_manifest(ctx, **unused_ctxs):
     manifest_ctx = _resources.bump_min_sdk(
@@ -39,6 +40,14 @@ def _process_manifest(ctx, **unused_ctxs):
 def _process_resources_for_android_local_test(ctx, manifest_ctx, java_package, **unused_ctx):
     packaged_resources_ctx = _resources.package(
         ctx,
+        resource_files = ctx.files.resource_files,
+        assets = ctx.files.assets,
+        assets_dir = ctx.attr.assets_dir,
+        resource_configs = ctx.attr.resource_configuration_filters,
+        densities = ctx.attr.densities,
+        nocompress_extensions = ctx.attr.nocompress_extensions,
+        compilation_mode = compilation_mode.get(ctx),
+        shrink_resources = _attrs.tristate.no,
         manifest = manifest_ctx.processed_manifest,
         manifest_values = utils.expand_make_vars(ctx, ctx.attr.manifest_values),
         java_package = java_package,
@@ -66,7 +75,7 @@ def _is_test_binary(ctx):
     """
     return ctx.attr.testonly or ctx.attr.instruments or str(ctx.label).find("/javatests/") >= 0
 
-PROCESSORS_FOR_ANDROID_LOCAL_TEST = dict(
+PROCESSORS = dict(
     ManifestProcessor = _process_manifest,
     ResourceProcessor = _process_resources_for_android_local_test,
 )
