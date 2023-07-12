@@ -102,3 +102,9 @@ def define_flags():
         default = False,
         description = "Enables namespaced R class generation",
     )
+
+    flags.DEFINE_bool(
+        name = "output_library_merged_assets",
+        default = True,
+        description = "If disabled, does not produce merged asset.zip outputs for library targets",
+    )

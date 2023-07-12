@@ -1271,7 +1271,8 @@ def _process_starlark(
         instrument_xslt = None,
         xsltproc = None,
         zip_tool = None,
-        namespaced_r_class = False):
+        namespaced_r_class = False,
+        output_library_merged_assets = True):
     """Processes Android Resources.
 
     Args:
@@ -1536,29 +1537,31 @@ def _process_starlark(
             busybox = busybox,
             host_javabase = host_javabase,
         )
-        merged_assets = ctx.actions.declare_file(
-            "_migrated/" + ctx.label.name + "_files/assets.zip",
-        )
-        _busybox.merge_assets(
-            ctx,
-            out_assets_zip = merged_assets,
-            assets = assets,
-            assets_dir = assets_dir,
-            symbols = parsed_assets,
-            direct_resources_nodes = depset(
-                transitive = direct_resources_nodes,
-                order = "preorder",
-            ),
-            transitive_resources_nodes = depset(
-                transitive = transitive_resources_nodes,
-                order = "preorder",
-            ),
-            transitive_assets = transitive_assets,
-            transitive_assets_symbols = transitive_assets_symbols,
-            busybox = busybox,
-            host_javabase = host_javabase,
-        )
-        resources_ctx[_VALIDATION_RESULTS].append(merged_assets)
+
+        if output_library_merged_assets:
+            merged_assets = ctx.actions.declare_file(
+                "_migrated/" + ctx.label.name + "_files/assets.zip",
+            )
+            _busybox.merge_assets(
+                ctx,
+                out_assets_zip = merged_assets,
+                assets = assets,
+                assets_dir = assets_dir,
+                symbols = parsed_assets,
+                direct_resources_nodes = depset(
+                    transitive = direct_resources_nodes,
+                    order = "preorder",
+                ),
+                transitive_resources_nodes = depset(
+                    transitive = transitive_resources_nodes,
+                    order = "preorder",
+                ),
+                transitive_assets = transitive_assets,
+                transitive_assets_symbols = transitive_assets_symbols,
+                busybox = busybox,
+                host_javabase = host_javabase,
+            )
+            resources_ctx[_VALIDATION_RESULTS].append(merged_assets)
 
         if assets:
             compiled_assets = ctx.actions.declare_file(
@@ -1935,6 +1938,7 @@ def _process(
         fix_export_exporting = False,
         propagate_resources = True,
         namespaced_r_class = False,
+        output_library_merged_assets = True,
         zip_tool = None):
     out_ctx = _process_starlark(
         ctx,
@@ -1968,6 +1972,7 @@ def _process(
         host_javabase = host_javabase,
         zip_tool = zip_tool,
         namespaced_r_class = namespaced_r_class,
+        output_library_merged_assets = output_library_merged_assets,
     )
 
     if _VALIDATION_OUTPUTS not in out_ctx:

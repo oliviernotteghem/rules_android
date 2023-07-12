@@ -28,6 +28,7 @@ load(
     _java = "java",
 )
 load("//rules:providers.bzl", "AndroidLintRulesInfo")
+load("//rules/flags:flags.bzl", _flags = "flags")
 load(
     "//rules:resources.bzl",
     _resources = "resources",
@@ -156,6 +157,7 @@ def _process_resources(
         exports_manifest = getattr(ctx.attr, "exports_manifest", True),
         propagate_resources = True,
         namespaced_r_class = False,
+        output_library_merged_assets = _flags.get(ctx).output_library_merged_assets,
 
         # Tool and Processing related inputs
         aapt = _get_android_toolchain(ctx).aapt2.files_to_run,
@@ -176,7 +178,6 @@ def _process_resources(
 <manifest package="%s">
 </manifest>
 """ % package)
-
 
     return struct(**resources_ctx)
 
