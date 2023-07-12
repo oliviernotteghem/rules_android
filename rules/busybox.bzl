@@ -856,6 +856,7 @@ def _merge_manifests(
         out_file = None,
         out_log_file = None,
         merge_type = "APPLICATION",
+        merge_manifest_permissions = False,
         manifest = None,
         mergee_manifests = depset(),
         manifest_values = None,
@@ -869,6 +870,8 @@ def _merge_manifests(
       out_file: A File. The output merged manifest.
       out_log_file: A File. The output log from the merge tool.
       merge_type: A string, either APPLICATION or LIBRARY. Type of merging.
+      merge_manifest_permissions: A boolean, Determines of the manifest merger should
+        merge manifest permissions.
       manifest: A File. The primary AndroidManifest.xml.
       mergee_manifests: A depset of Files. All transitive manifests to be merged.
       manifest_values: A dictionary. Manifest values to substitute.
@@ -909,6 +912,8 @@ def _merge_manifests(
     if out_log_file:
         args.add("--log", out_log_file)
         outputs.append(out_log_file)
+    if merge_manifest_permissions:
+        args.add("--mergeManifestPermissions")
 
     _disable_warnings(args)
 
