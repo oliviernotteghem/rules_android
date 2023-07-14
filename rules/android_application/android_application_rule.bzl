@@ -368,7 +368,6 @@ def android_application_macro(_android_binary, **attrs):
 
     # Create an android_binary base split, plus an android_application to produce the aab
     name = attrs.pop("name")
-    base_split_name = "%s_base" % name
 
     # default to [] if feature_modules = None is passed
     feature_modules = attrs.pop("feature_modules", []) or []
@@ -386,13 +385,13 @@ def android_application_macro(_android_binary, **attrs):
         attrs["deps"].append(str(module_targets.title_lib))
 
     _android_binary(
-        name = base_split_name,
+        name = name,
         **attrs
     )
 
     android_application(
-        name = name,
-        base_module = ":%s" % base_split_name,
+        name = "%s_aab" % name,
+        base_module = ":%s" % name,
         bundle_config_file = bundle_config_file,
         app_integrity_config = app_integrity_config,
         rotation_config = rotation_config,
