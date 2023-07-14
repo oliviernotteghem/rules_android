@@ -561,14 +561,6 @@ def impl(ctx):
     )
     providers.extend(lint_providers)
 
-    validation_outputs.append(_validate_rule(
-        ctx,
-        aar = aar,
-        package = package,
-        manifest = manifest_ctx.processed_manifest,
-        checks = _get_android_toolchain(ctx).aar_import_checks.files_to_run,
-    ))
-
     providers.append(
         intellij.make_android_ide_info(
             ctx,
