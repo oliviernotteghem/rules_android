@@ -48,7 +48,10 @@ load(
     "//rules:android_tools_defaults_jar.bzl",
     _android_tools_defaults_jar = "android_tools_defaults_jar",
 )
-
+load(
+    "//rules/android_local_test:rule.bzl",
+    _android_local_test = "android_local_test",
+)
 # Current version. Tools may check this to determine compatibility.
 RULES_ANDROID_VERSION = "0.1.0"
 
@@ -56,6 +59,7 @@ aar_import = _aar_import
 android_application = _android_application
 android_binary = _android_binary
 android_library = _android_library
+android_local_test = _android_local_test
 android_ndk_repository = _android_ndk_repository
 android_sdk = _android_sdk
 android_sdk_repository = _android_sdk_repository
