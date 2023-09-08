@@ -73,9 +73,11 @@ def process_r8(ctx, jvm_ctx, packaged_resources_ctx, build_info_ctx, **_unused_c
 
     android_jar = get_android_sdk(ctx).android_jar
     proguard_specs = proguard.get_proguard_specs(ctx, packaged_resources_ctx.resource_proguard_config)
+    proguard_mappings_file = ctx.actions.declare_file(ctx.label.name + "_proguard.txt")
 
     args = ctx.actions.args()
     args.add("--release")
+    args.add("--pg-map-output", proguard_mappings_file)
     args.add("--output", dexes_zip)
     args.add_all(proguard_specs, before_each = "--pg-conf")
     args.add("--lib", android_jar)
@@ -104,6 +106,7 @@ def process_r8(ctx, jvm_ctx, packaged_resources_ctx, build_info_ctx, **_unused_c
         name = "r8_ctx",
         value = struct(
             final_classes_dex_zip = dexes_zip,
+            proguard_mappings_file = proguard_mappings_file,
             providers = [android_dex_info],
         ),
     )
