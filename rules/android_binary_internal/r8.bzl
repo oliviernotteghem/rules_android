@@ -73,7 +73,7 @@ def process_r8(ctx, jvm_ctx, packaged_resources_ctx, build_info_ctx, **_unused_c
 
     android_jar = get_android_sdk(ctx).android_jar
     proguard_specs = proguard.get_proguard_specs(ctx, packaged_resources_ctx.resource_proguard_config)
-    proguard_mappings_file = ctx.actions.declare_file(ctx.label.name + "_proguard.txt")
+    proguard_mappings_file = ctx.actions.declare_file(ctx.label.name + "_proguard.map")
 
     args = ctx.actions.args()
     args.add("--release")
