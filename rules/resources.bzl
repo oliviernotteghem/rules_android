@@ -1328,7 +1328,8 @@ def _process_starlark(
         host_javabase = None,
         instrument_xslt = None,
         xsltproc = None,
-        zip_tool = None):
+        zip_tool = None,
+        link_library_resources = True):
     """Processes Android Resources.
 
     Args:
@@ -1382,6 +1383,8 @@ def _process_starlark(
       instrument_xslt: File. The xslt transform to apply g3itr.
       xsltproc: FilesToRunProvider. The xsltproc executable or FilesToRunProvider.
       zip_tool: FilesToRunProvider. The zip tool executable or FilesToRunProvider.
+      link_library_resources: boolean. Whether to run or skip 'aapt link' on
+        android library resources.
 
     Returns:
       A dict containing _ResourcesProcessContextInfo provider fields.
@@ -1681,9 +1684,22 @@ def _process_starlark(
         processed_manifest = ctx.actions.declare_file(
             "_migrated/" + ctx.label.name + "_processed_manifest/AndroidManifest.xml",
         )
+        r_txt_filename = "R.aapt2.txt" if link_library_resources else "R.txt"
         out_aapt2_r_txt = ctx.actions.declare_file(
-            "_migrated/" + ctx.label.name + "_symbols/R.aapt2.txt",
+            "_migrated/" + ctx.label.name + "_symbols/%s" % r_txt_filename,
         )
+
+        _busybox.compile(
+            ctx,
+            out_file = compiled_resources,
+            manifest = manifest,
+            android_jar = android_jar,
+            resource_files = processed_resources,
+            aapt = aapt,
+            busybox = busybox,
+            host_javabase = host_javabase,
+        )
+
         _busybox.merge_compiled(
             ctx,
             out_class_jar = out_class_jar,
@@ -1710,6 +1726,46 @@ def _process_starlark(
             busybox = busybox,
             host_javabase = host_javabase,
         )
+
+        if link_library_resources:
+            apk = ctx.actions.declare_file(
+                "_migrated/" + ctx.label.name + "_files/library.ap_",
+            )
+            r_java = ctx.actions.declare_file(
+                "_migrated/" + ctx.label.name + ".srcjar",
+            )
+            r_txt = ctx.actions.declare_file(
+                "_migrated/" + ctx.label.name + "_symbols/R.txt",
+            )
+            _busybox.validate_and_link(
+                ctx,
+                out_r_src_jar = r_java,
+                out_r_txt = r_txt,
+                out_file = apk,
+                compiled_resources = compiled_resources,
+                transitive_compiled_resources = depset(
+                    transitive = transitive_compiled_resources,
+                    order = "preorder",
+                ),
+                java_package = java_package,
+                manifest = processed_manifest,
+                android_jar = android_jar,
+                aapt = aapt,
+                busybox = busybox,
+                host_javabase = host_javabase,
+                resource_apks = resource_apks,
+            )
+            resources_ctx[_RESOURCES_APK] = apk
+        else:
+            r_txt = out_aapt2_r_txt
+            r_java = None
+
+        java_info = JavaInfo(
+            output_jar = out_class_jar,
+            compile_jar = out_class_jar,
+            source_jar = r_java,
+        )
+
         resources_ctx[_MERGED_MANIFEST] = processed_manifest
 
         apk = ctx.actions.declare_file(
@@ -1966,7 +2022,8 @@ def _process(
         res_v3_dummy_r_txt = None,
         fix_resource_transitivity = False,
         propagate_resources = True,
-        zip_tool = None):
+        zip_tool = None,
+        link_library_resources = True):
     out_ctx = _process_starlark(
         ctx,
         java_package = java_package,
@@ -1998,6 +2055,7 @@ def _process(
         java_toolchain = java_toolchain,
         host_javabase = host_javabase,
         zip_tool = zip_tool,
+        link_library_resources = link_library_resources,
     )
 
 

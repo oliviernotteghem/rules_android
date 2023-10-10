@@ -97,3 +97,9 @@ def define_flags():
         default = True,
         description = "Use Studio Deployer to install apks",
     )
+
+    flags.DEFINE_bool(
+        name = "link_library_resources",
+        default = True,
+        description = "If disabled, resource linking will be skipped on android libraries targets",
+    )
