@@ -114,3 +114,9 @@ def define_flags():
         default = False,
         description = "If disabled, does not merge manifest permissions.",
     )
+
+    flags.DEFINE_bool(
+        name = "link_library_resources",
+        default = True,
+        description = "If disabled, resource linking will be skipped on android libraries",
+    )
