@@ -28,7 +28,7 @@ def _process_manifest(ctx, **unused_ctxs):
     manifest_ctx = _resources.bump_min_sdk(
         ctx,
         manifest = ctx.file.manifest,
-        floor = _resources.DEPOT_MIN_SDK_FLOOR if (_is_test_binary(ctx) and acls.in_enforce_min_sdk_floor_rollout(str(ctx.label))) else 0,
+        floor = acls.get_min_sdk_floor(str(ctx.label)),
         enforce_min_sdk_floor_tool = get_android_toolchain(ctx).enforce_min_sdk_floor_tool.files_to_run,
     )
 
@@ -63,17 +63,6 @@ def _process_resources_for_android_local_test(ctx, manifest_ctx, java_package, *
         name = "packaged_resources_ctx",
         value = packaged_resources_ctx,
     )
-
-def _is_test_binary(ctx):
-    """Whether this android_binary target is a test binary.
-
-    Args:
-      ctx: The context.
-
-    Returns:
-      Boolean indicating whether the target is a test target.
-    """
-    return ctx.attr.testonly or ctx.attr.instruments or str(ctx.label).find("/javatests/") >= 0
 
 PROCESSORS = dict(
     ManifestProcessor = _process_manifest,

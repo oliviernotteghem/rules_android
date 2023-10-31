@@ -19,8 +19,6 @@ cover the entire depot.
 """
 
 MIN_SDK_FLOORS = {
-    19: [
-    ],
-    14: [
+    0: [
     ],
 }
