@@ -189,6 +189,8 @@ _ResourcesOptimizeContextInfo = provider(
 # rules with resource shrinking and ProGuard enabled.
 _FEATURE_RESOURCE_NAME_OBFUSCATION = "resource_name_obfuscation"
 
+_TARGET_WITH_BOGUS_MANIFEST = ["@maven//:androidx_work_work_runtime"]
+
 def _generate_dummy_manifest(
         ctx,
         out_manifest = None,
@@ -626,7 +628,7 @@ def _package(
     mergee_manifests = depset([
         node_info.manifest
         for node_info in depset(transitive = transitive_resources_nodes + direct_resources_nodes).to_list()
-        if node_info.exports_manifest
+        if (node_info.exports_manifest and str(node_info.label) not in _TARGET_WITH_BOGUS_MANIFEST)
     ])
 
     if not acls.in_shared_library_resource_linking_allowlist(str(ctx.label)):
