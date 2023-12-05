@@ -28,35 +28,48 @@ load(
 )
 
 def _impl(ctx):
-    validation = ctx.actions.declare_file(ctx.label.name + "_validation")
-    inputs = [ctx.attr.binary[ApkInfo].unsigned_apk]
-    args = ctx.actions.args()
-    args.add(validation.path)
-    if ctx.file.manifest:
-        args.add(ctx.file.manifest.path)
-        inputs.append(ctx.file.manifest)
-    else:
-        args.add("")
-    args.add(ctx.attr.binary[ApkInfo].unsigned_apk.path)
-    args.add(ctx.configuration.coverage_enabled)
-    args.add(ctx.fragments.android.desugar_java8_libs)
-    args.add(utils.dedupe_split_attr(ctx.split_attr.library).label)
-    args.add(get_android_toolchain(ctx).xmllint_tool.files_to_run.executable)
-    args.add(get_android_toolchain(ctx).unzip_tool.files_to_run.executable)
+    if 'skip_feature_module_validation' not in ctx.attr.tags:
+        validation = ctx.actions.declare_file(ctx.label.name + "_validation")
+        inputs = [ctx.attr.binary[ApkInfo].unsigned_apk]
+        args = ctx.actions.args()
+        args.add(validation.path)
+        if ctx.file.manifest:
+            args.add(ctx.file.manifest.path)
+            inputs.append(ctx.file.manifest)
+        else:
+            args.add("")
+        args.add(ctx.attr.binary[ApkInfo].unsigned_apk.path)
+        args.add(ctx.configuration.coverage_enabled)
+        args.add(ctx.fragments.android.desugar_java8_libs)
+        args.add(utils.dedupe_split_attr(ctx.split_attr.library).label)
+        args.add(get_android_toolchain(ctx).xmllint_tool.files_to_run.executable)
+        args.add(get_android_toolchain(ctx).unzip_tool.files_to_run.executable)
 
-    ctx.actions.run(
-        executable = ctx.executable._feature_module_validation_script,
-        inputs = inputs,
-        outputs = [validation],
-        arguments = [args],
-        tools = [
-            get_android_toolchain(ctx).xmllint_tool.files_to_run.executable,
-            get_android_toolchain(ctx).unzip_tool.files_to_run.executable,
-        ],
-        mnemonic = "ValidateFeatureModule",
-        progress_message = "Validating feature module %s" % str(ctx.label),
-        toolchain = None,
-    )
+        ctx.actions.run(
+            executable = ctx.executable._feature_module_validation_script,
+            inputs = inputs,
+            outputs = [validation],
+            arguments = [args],
+            tools = [
+                get_android_toolchain(ctx).xmllint_tool.files_to_run.executable,
+                get_android_toolchain(ctx).unzip_tool.files_to_run.executable,
+            ],
+            mnemonic = "ValidateFeatureModule",
+            progress_message = "Validating feature module %s" % str(ctx.label),
+            toolchain = None,
+        )
+
+        return [
+            AndroidFeatureModuleInfo(
+                binary = ctx.attr.binary,
+                library = utils.dedupe_split_attr(ctx.split_attr.library),
+                title_id = ctx.attr.title_id,
+                title_lib = ctx.attr.title_lib,
+                feature_name = ctx.attr.feature_name,
+                manifest = ctx.file.manifest,
+            ),
+            OutputGroupInfo(_validation = depset([validation])),
+        ]
 
     return [
         AndroidFeatureModuleInfo(
@@ -66,8 +79,7 @@ def _impl(ctx):
             title_lib = ctx.attr.title_lib,
             feature_name = ctx.attr.feature_name,
             manifest = ctx.file.manifest,
-        ),
-        OutputGroupInfo(_validation = depset([validation])),
+        )
     ]
 
 android_feature_module = rule(
@@ -86,10 +98,10 @@ def get_feature_module_paths(fqn):
     # Given a fqn to an android_feature_module, returns the absolute paths to
     # all implicitly generated targets
     return struct(
-        binary = Label("%s_bin" % fqn),
-        manifest_lib = Label("%s_AndroidManifest" % fqn),
-        title_strings_xml = Label("%s_title_strings_xml" % fqn),
-        title_lib = Label("%s_title_lib" % fqn),
+        binary = native.package_relative_label("%s_bin" % fqn),
+        manifest_lib = native.package_relative_label("%s_AndroidManifest" % fqn),
+        title_strings_xml = native.package_relative_label("%s_title_strings_xml" % fqn),
+        title_lib = native.package_relative_label("%s_title_lib" % fqn),
     )
 
 def android_feature_module_macro(_android_binary, _android_library, **attrs):

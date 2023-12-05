@@ -29,8 +29,8 @@ ANDROID_APPLICATION_ATTRS = _attrs.add(
         manifest_values = attr.string_dict(),
         base_module = attr.label(allow_files = False),
         bundle_config_file = attr.label(
-            allow_single_file = [".pb.json"],
-            doc = ("Path to config.pb.json file, see " +
+            allow_single_file = [".json"],
+            doc = ("Path to config.json file, see " +
                    "https://github.com/google/bundletool/blob/master/src/main/proto/config.proto " +
                    "for definition.\n\nNote: this attribute is subject to changes which may " +
                    "require teams to migrate their configurations to a build target."),
@@ -75,8 +75,7 @@ ANDROID_APPLICATION_ATTRS = _attrs.add(
             default = Label("//tools/jdk:toolchain_android_only"),
         ),
         _merge_manifests = attr.label(
-            default = ":merge_feature_manifests.par",
-            allow_single_file = True,
+            default = ":merge_feature_manifests",
             cfg = "exec",
             executable = True,
         ),
@@ -98,7 +97,7 @@ ANDROID_FEATURE_MODULE_ATTRS = dict(
     binary = attr.label(),
     feature_name = attr.string(),
     library = attr.label(
-        allow_rules = ["android_library"],
+        allow_rules = ["android_library", "kt_android_library"],
         cfg = android_common.multi_cpu_configuration,
         mandatory = True,
         doc = "android_library target to include as a feature split.",

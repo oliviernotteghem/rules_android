@@ -18,7 +18,7 @@ base_apk="${2}"
 package="${3}"
 split="${4}"
 title_id="${5}"
-aapt="${7}"
+aapt="${6}"
 
 aapt_cmd="$aapt dump xmltree $base_apk --file AndroidManifest.xml"
 version_code=$(${aapt_cmd} | grep "http://schemas.android.com/apk/res/android:versionCode" | cut -d "=" -f2 | head -n 1 )
