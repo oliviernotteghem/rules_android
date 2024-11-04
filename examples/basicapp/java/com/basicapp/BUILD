@@ -11,4 +11,5 @@ android_library(
     srcs = ["BasicActivity.java"],
     manifest = "AndroidManifest.xml",
     resource_files = glob(["res/**"]),
+    deps = ["//java/lib:other_lib"]
 )
